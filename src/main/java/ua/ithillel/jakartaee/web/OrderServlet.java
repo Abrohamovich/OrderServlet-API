@@ -1,7 +1,6 @@
 package ua.ithillel.jakartaee.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -57,7 +56,11 @@ public class OrderServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        int orderProductsCount = 1;
         double totalCost = 0;
+        for (Order order : orderInMemory.values()) {
+            orderProductsCount += order.getProducts().size();
+        }
         Order order = mapper.readValue(req.getReader(), Order.class);
         if(order.getId() == null){
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -65,9 +68,8 @@ public class OrderServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } else {
             Order orderDB = orderInMemory.get(order.getId());
-            int orderProductMinId = orderDB.getProducts().getFirst().getId();
             for (Product product : order.getProducts()) {
-                product.setId(orderProductMinId++);
+                product.setId(orderProductsCount++);
                 totalCost += product.getCost();
             }
             orderDB.setProducts(order.getProducts());

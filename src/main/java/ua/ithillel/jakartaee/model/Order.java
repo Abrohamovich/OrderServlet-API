@@ -1,5 +1,6 @@
 package ua.ithillel.jakartaee.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +12,7 @@ import java.util.Objects;
 @Setter
 public class Order {
     private Integer id;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date date;
     private double cost;
     private List<Product> products;
