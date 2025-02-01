@@ -12,7 +12,7 @@ import java.util.Objects;
 public class Order {
     private Integer id;
     private Date date;
-    private int cost;
+    private double cost;
     private List<Product> products;
 
     @Override

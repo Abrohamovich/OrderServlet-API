@@ -1,6 +1,7 @@
 package ua.ithillel.jakartaee.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,9 +20,9 @@ public class OrderServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         int orderProductsCount = 1;
-        int totalCost = 0;
+        double totalCost = 0;
         int orderCounter = orderInMemory.size() + 1;
-        for(Order order : orderInMemory.values()) {
+        for (Order order : orderInMemory.values()) {
             orderProductsCount += order.getProducts().size();
         }
         Order order = mapper.readValue(req.getReader(), Order.class);
@@ -30,7 +31,7 @@ public class OrderServlet extends HttpServlet {
 
         for (Product product : orderProducts) {
             product.setId(orderProductsCount++);
-            totalCost+=product.getCost();
+            totalCost += product.getCost();
         }
         order.setCost(totalCost);
         orderInMemory.put(order.getId(), order);
@@ -40,15 +41,52 @@ public class OrderServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String orderId = req.getParameter("id");
-        if (orderId.isBlank()) {
+        if (orderId == null) {
             resp.getWriter().write(mapper.writeValueAsString(orderInMemory.values()));
+        } else if (orderId.isEmpty()) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } else {
             int id = Integer.parseInt(orderId);
             Order order = orderInMemory.get(id);
-            if(order == null) {
+            if (order == null) {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             }
             resp.getWriter().write(mapper.writeValueAsString(order));
+        }
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        double totalCost = 0;
+        Order order = mapper.readValue(req.getReader(), Order.class);
+        if(order.getId() == null){
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        } else if (!orderInMemory.containsKey(order.getId())) {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        } else {
+            Order orderDB = orderInMemory.get(order.getId());
+            int orderProductMinId = orderDB.getProducts().getFirst().getId();
+            for (Product product : order.getProducts()) {
+                product.setId(orderProductMinId++);
+                totalCost += product.getCost();
+            }
+            orderDB.setProducts(order.getProducts());
+            orderDB.setCost(totalCost);
+            resp.getWriter().write(mapper.writeValueAsString(orderDB));
+        }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
+        String orderId = req.getParameter("id");
+        if (orderId == null || orderId.isEmpty()) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        } else {
+            int id = Integer.parseInt(orderId);
+            if (!orderInMemory.containsKey(id)) {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            }
+            orderInMemory.remove(id);
         }
     }
 }
