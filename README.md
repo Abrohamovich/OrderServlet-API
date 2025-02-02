@@ -14,8 +14,8 @@ This project is a simple API for managing orders. The API allows creating, retri
     "date": "2025-02-01",
     "products": [
         {
-            "name": "{{$randomProduct}}",
-            "cost": {{$randomPrice}}
+            "name": "Keyboard",
+            "cost": 447.67
         }
     ]
 }
@@ -35,6 +35,7 @@ This project is a simple API for managing orders. The API allows creating, retri
     ]
 }
 ```
+![save.png](img/save.png)
 
 ### Retrieve an Order
 **GET /order?id={id}**
@@ -75,6 +76,7 @@ http://localhost:9090/jakartaee-project/orders?id=1
     }
 ]
 ```
+![get-all.png](img/get-all.png)
 ```
 {
     "id": 1,
@@ -89,6 +91,7 @@ http://localhost:9090/jakartaee-project/orders?id=1
     ]
 }
 ```
+![get-1.png](img/get-1.png)
 
 ### Update an Order
 **PUT /order**
@@ -130,6 +133,7 @@ http://localhost:9090/jakartaee-project/orders?id=1
     ]
 }
 ```
+![update.png](img/update.png)
 
 ### Delete an Order
 **DELETE /order?id={id}**
@@ -139,7 +143,8 @@ http://localhost:9090/jakartaee-project/orders?id=1
 http://localhost:9090/jakartaee-project/orders?id=1
 ```
 - Output: None.
-
+![delete.png](img/delete.png)
+- 
 ## Running the Project
 1. Compile and start the server.
 2. Use tools like Postman or cURL to test the API.
